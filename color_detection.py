@@ -43,7 +43,7 @@ class MyLayout(MDScreen):
         self.add_widget(self.color_result)
 
     def loadVideo(self, *args):
-        ret, frame = self.capture.read()
+        _, frame = self.capture.read()
         self.img_frame = frame
         
         if color_name!='':
@@ -56,6 +56,9 @@ class MyLayout(MDScreen):
                 
                 contours, _ = cv2.findContours(mask, cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
                 cv2.drawContours(frame, contours, -1, (0, 255, 0), 2)
+
+        elif color_name == 'null':
+            cv2.drawContours(frame, None, 0, (0, 255, 0), 2)
 
         buf = cv2.flip(frame, 0).tostring()
         texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
@@ -78,7 +81,7 @@ class MyLayout(MDScreen):
             B = int(b)
             G = int(g)
             R = int(r)
-            minimum = 10000
+            minimum = 1000
             for i in range(len(self.df)):
                 d = abs(R - int(self.df.loc[i, "R"])) + abs(G - int(self.df.loc[i, "G"])) + abs(B - int(self.df.loc[i, "B"]))
                 if d <= minimum:
@@ -99,30 +102,32 @@ class MyLayout(MDScreen):
         color = self.get_color_name(p)
         self.initialColor = color
         self.color_result.text = 'Color result : '+color+'\n'
+        #top left : (81.0, 603.0)
+        #right bottom : (721.0, 125.00000000000003)
 
     def on_touch_down(self, touch):
 
-        #top left : (81.0, 603.0)
-        #right bottom : (721.0, 125.00000000000003)
-        
         # print(touch.pos)
         p = touch.pos
         cname = self.get_color_name(p)
 
         # print(cname)
         self.color_result.text = 'Color result : '+cname+'\n'
-
-        # engine = pyttsx3.init()
-        # engine.say(self.color_result.text)
-        # engine.runAndWait()
+        
+        if cname != 'out of range':
+            engine = pyttsx3.init()
+            engine.say(self.color_result.text)
+            engine.runAndWait()
 
     @staticmethod
     def search_color(t):
+        global color_name
         if t!='':
-            global color_name
             t = t.lower()
             color_name = t
             print(t)
+        if t == '':
+            color_name = 'null'
 
 class ColorDetectionApp(MDApp):
 
@@ -131,6 +136,7 @@ class ColorDetectionApp(MDApp):
 
         self.toolbar = Builder.load_string(heading_helper)
         ly.add_widget(self.toolbar)
+        
         img = MyLayout()
         ly.add_widget(img)
 

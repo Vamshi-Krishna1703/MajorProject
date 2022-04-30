@@ -36,13 +36,13 @@ def get_color_name(R, G, B):
 
 def identify_color(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
-    	global b, g, r, xpos, ypos, clicked
-    	xpos = x
-    	ypos = y
-    	b, g, r = frame[y,x]
-    	b = int(b)
-    	g = int(g)
-    	r = int(r)
+        global b, g, r, xpos, ypos, clicked
+        xpos = x
+        ypos = y
+        b, g, r = frame[y,x]
+        b = int(b)
+        g = int(g)
+        r = int(r)
 
 
 cv2.namedWindow('Open CV Color Detection')
