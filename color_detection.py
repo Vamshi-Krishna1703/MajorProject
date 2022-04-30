@@ -102,11 +102,11 @@ class MyLayout(MDScreen):
         color = self.get_color_name(p)
         self.initialColor = color
         self.color_result.text = 'Color result : '+color+'\n'
-        #top left : (81.0, 603.0)
-        #right bottom : (721.0, 125.00000000000003)
 
     def on_touch_down(self, touch):
 
+        #top left : (81.0, 603.0)
+        #right bottom : (721.0, 125.00000000000003)
         # print(touch.pos)
         p = touch.pos
         cname = self.get_color_name(p)
