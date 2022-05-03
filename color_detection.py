@@ -1,4 +1,3 @@
-
 import cv2
 import numpy as np
 import pandas as pd
@@ -13,13 +12,14 @@ from kivymd.uix.button import MDRaisedButton
 from kivymd.uix.label import MDLabel
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.textfield import MDTextField
-from kivy.uix.gridlayout import GridLayout
+from kivymd.uix.gridlayout import MDGridLayout
 from kivy.core.window import Window
 
 from helper import (color_list, color_text_helper, label_helper,
-                    search_button_helper,heading_helper)
+                    search_button_helper, heading_helper, grid_helper, camswitch_helper)
 
 color_name = ''
+clicked = False
 Window.size = (800, 700)
 class MyLayout(MDScreen):
     global color_name
@@ -34,6 +34,7 @@ class MyLayout(MDScreen):
         self.df = pd.read_csv('colors.csv', names = index, header = None)
 
         self.add_widget(self.image)
+
         self.capture = cv2.VideoCapture(0)
         Clock.schedule_interval(self.loadVideo, 1.0 / 30.0)
 
@@ -42,7 +43,12 @@ class MyLayout(MDScreen):
         self.color_result.text+='\n'
         self.add_widget(self.color_result)
 
+        self.cam_btn = Builder.load_string(camswitch_helper)
+        self.cam_btn.bind(on_press = self.switch_cam)
+        self.add_widget(self.cam_btn)
+
     def loadVideo(self, *args):
+
         _, frame = self.capture.read()
         self.img_frame = frame
         
@@ -70,8 +76,8 @@ class MyLayout(MDScreen):
             # self.color_result.text =  'Color result : '+self.initialColor+'\n'
 
     def get_color_name(self, p):
-        c, d = 81, 603 # top-left
-        t, q = 721 , 125 # bottom-right
+        c, d = 81, 584 # top-left
+        t, q = 719, 107 # bottom-right
 
         if p[0]>=c and p[0] <=t and p[1]>=q and p[1]<=d:
             new_pos_x = int(p[0]) - c
@@ -89,11 +95,11 @@ class MyLayout(MDScreen):
                     cname = self.df.loc[i, "color_name"]
             return cname
         else :
-            return 'out of range'
+            return 'out of frame'
 
     def getInitialColor(self):
-        c, d = 81, 603 # top-left
-        t, q = 721 , 125 # bottom-right
+        c, d = 81, 584 # top-left
+        t, q = 719, 107 # bottom-right
 
         mid_x = (c+t)//2
         mid_y = (d+q)//2
@@ -105,19 +111,21 @@ class MyLayout(MDScreen):
 
     def on_touch_down(self, touch):
 
-        #top left : (81.0, 603.0)
-        #right bottom : (721.0, 125.00000000000003)
-        # print(touch.pos)
+        #top left : (80.0, 584.0)
+        #right bottom : (719.0, 106.99999999999996)
+        print(touch.pos)
         p = touch.pos
         cname = self.get_color_name(p)
 
         # print(cname)
         self.color_result.text = 'Color result : '+cname+'\n'
         
-        if cname != 'out of range':
-            engine = pyttsx3.init()
-            engine.say(self.color_result.text)
-            engine.runAndWait()
+        # if cname != 'out of frame':
+        #     engine = pyttsx3.init()
+        #     engine.say(self.color_result.text)
+        #     engine.runAndWait()
+
+        return super(MDScreen, self).on_touch_down(touch)
 
     @staticmethod
     def search_color(t):
@@ -128,6 +136,16 @@ class MyLayout(MDScreen):
             print(t)
         if t == '':
             color_name = 'null'
+    
+    def switch_cam(self, *args):
+        print('clicked')
+        global clicked
+        clicked = not clicked
+        if clicked:
+            self.capture = cv2.VideoCapture(1)
+        else:
+            self.capture = cv2.VideoCapture(0)
+        self.getInitialColor()
 
 class ColorDetectionApp(MDApp):
 
@@ -140,18 +158,29 @@ class ColorDetectionApp(MDApp):
         img = MyLayout()
         ly.add_widget(img)
 
+        temp = Builder.load_string(grid_helper)
+
         self.color_name = Builder.load_string(color_text_helper)
-        ly.add_widget(self.color_name)
+        temp.add_widget(self.color_name)
 
         self.color_btn = Builder.load_string(search_button_helper)
         self.color_btn.bind(on_press = self.search_color)
-        ly.add_widget(self.color_btn)
+        temp.add_widget(self.color_btn)
 
+        ly.add_widget(temp)
+
+        # self.cam_btn = Builder.load_string(camswitch_helper)
+        # self.cam_btn.bind(on_press = self.switch_cam)
+        # ly.add_widget(self.cam_btn)
         return ly
 
     def search_color(self, *args):
         t = self.color_name.text
         MyLayout.search_color(t)
+
+    def switch_cam(self, *args):
+        global clicked
+        clicked = not clicked
 
 if __name__ == '__main__':
     ColorDetectionApp().run()

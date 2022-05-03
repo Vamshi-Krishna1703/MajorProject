@@ -8,13 +8,19 @@ MDToolbar:
     title: "Color Detection and Color Search"
 
 """
+grid_helper = """
+MDGridLayout:
+    pos_hint : {'center_x':0.5, 'center_y':0.9}
+    cols : 2
+    adaptive_size : True
 
+"""
 label_helper = """
 MDLabel:
     text : 'Color Result'
     halign : 'center'
     size_hint_y : None
-    height : 10
+    height : 0
 """
 
 color_text_helper = """
@@ -27,13 +33,20 @@ MDTextField:
 """
 
 search_button_helper = """
-MDRaisedButton:
-    text : 'Search'
+MDIconButton:
+    icon : 'magnify'
     pos_hint : {'center_x':.5, 'center_y':.9}
     size_hint_x : None
     size_hint_y : None
 """
 
+camswitch_helper = """
+MDFloatingActionButton:
+    icon : 'camera-flip'
+    pos_hint : {'center_x':.5, 'center_y':.9}
+    size_hint_x : None
+    size_hint_y : None
+"""
 
 color_list = {
     

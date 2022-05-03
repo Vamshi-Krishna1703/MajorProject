@@ -10,9 +10,8 @@ import cv2
 import imutils
 import numpy as np
 import pyttsx3
-engine = pyttsx3.init()
 
-camera = cv2.VideoCapture(0)
+camera = cv2.VideoCapture(1)
 # address = "https://192.168.0.11:8080/video"
 # camera.open(address)
 
